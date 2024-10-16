@@ -1,0 +1,9 @@
+[package]
+name = "rusty_wfc"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+colored = "2.1.0"
+rand = "0.8.5"
+weighted_rand = "0.4.2"
