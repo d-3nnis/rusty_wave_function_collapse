@@ -7,7 +7,7 @@
 pub struct Tile<T> {
     pub weight: f32,
     pub tile_id: T,
-    pub possible_neighbors: Vec<T>,
+    //pub possible_neighbors: Vec<T>,
     //pub possible_neighbors : Vec<&Tile>,
 
     // these should be abstracted away
@@ -31,15 +31,15 @@ where
             symbol,
             color,
             tile_id,
-            possible_neighbors: Vec::new(),
+            //possible_neighbors: Vec::new(),
         }
     }
 
-    pub fn set_possible_neighbors(&mut self, neighbors: Vec<T>) {
-        self.possible_neighbors = neighbors;
-    }
-
-    pub fn can_be_adjacent_to(&self, other: &T) -> bool {
-        self.possible_neighbors.contains(other)
-    }
+    // pub fn set_possible_neighbors(&mut self, neighbors: Vec<T>) {
+    //     self.possible_neighbors = neighbors;
+    // }
+    //
+    // pub fn can_be_adjacent_to(&self, other: &T) -> bool {
+    //     self.possible_neighbors.contains(other)
+    // }
 }
