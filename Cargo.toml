@@ -1,0 +1,16 @@
+[package]
+name = "wfc_too"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+colored = "3.0.0"
+rand = "0.9.0"
+
+[lib]
+name = "wfc_too"
+path = "src/lib.rs"
+
+[[bin]]
+name = "generate"
+path = "bin/generate.rs"
