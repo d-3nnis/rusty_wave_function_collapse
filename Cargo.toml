@@ -5,6 +5,9 @@ edition = "2021"
 
 [dependencies]
 colored = "3.0.0"
+crossterm = "0.28.1"
+eframe = "0.30.0"
+egui = "0.30.0"
 rand = "0.9.0"
 
 [lib]

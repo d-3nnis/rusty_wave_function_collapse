@@ -1,4 +1,6 @@
-use std::collections::{HashMap, HashSet};
+use std::collections::HashSet;
+
+use rand::{rng, seq::IndexedRandom};
 
 use crate::types::{PossibleValue, PossibleValues, TileType};
 
@@ -47,20 +49,41 @@ impl<T: TileType> Cell<T> {
         None
     }
 
-    pub fn constrain(&mut self, allowed: &PossibleValues<T>) {
-        self.possible_values.retain(|tile| allowed.contains(tile));
+    pub fn constrain_by_name(&mut self, allowed: &str) -> bool {
+        let initial_len = self.possible_values.len();
+        self.possible_values.retain(|tile| &tile.name != allowed);
+        assert!(self.possible_values.len() != 0);
+        return initial_len != self.possible_values.len();
     }
 
-    // pub fn collapse(&mut self, value: char) -> Result<(), String> {
-    //     if !self.possible_values.contains_key(&value) {
-    //         return Err(format!(
-    //             "Value {} is not in possible values: {:?}",
-    //             value, self.possible_values
-    //         ));
-    //     }
-    //     self.possible_values = HashMap::from([(value, 1.0)]);
-    //     Ok(())
-    // }
+    pub fn constrain(&mut self, allowed: &PossibleValues<T>) -> bool {
+        let initial_len = self.possible_values.len();
+        self.possible_values.retain(|tile| allowed.contains(tile));
+        assert!(self.possible_values.len() != 0);
+        return initial_len != self.possible_values.len();
+    }
+
+    pub fn collapse(&mut self) -> Result<PossibleValue<T>, String> {
+        if self.is_collapsed() {}
+        let mut rng = rng();
+        match self
+            .possible_values
+            .iter()
+            .cloned()
+            .collect::<Vec<_>>()
+            .choose_weighted(&mut rng, |tile| tile.weight)
+            .to_owned()
+        {
+            Ok(chosen_tile) => {
+                self.possible_values = HashSet::from([chosen_tile.clone()]);
+                // println!("Collapsing to {:?}", chosen_tile);
+                return Ok(chosen_tile.clone());
+            }
+            Err(err) => {
+                return Err(err.to_string());
+            }
+        }
+    }
 }
 
 impl<T: TileType> Grid<T> {
@@ -112,5 +135,80 @@ impl<T: TileType> Grid<T> {
         }
 
         cells
+    }
+
+    pub fn collapse_cell(&mut self, x: usize, y: usize) -> Result<PossibleValue<T>, String> {
+        match self.get_cell_mut(x, y) {
+            Some(cell) => {
+                if cell.is_collapsed() {
+                    return Err(format!("Cell at ({}, {}) is already collapsed", x, y));
+                }
+
+                match cell.collapse() {
+                    Ok(possible_value) => {
+                        return Ok(possible_value);
+                    }
+                    Err(err) => {
+                        return Err(err);
+                    }
+                }
+            }
+            None => {
+                return Err(format!("Cell at ({}, {}) does not exist", x, y));
+            }
+        }
+    }
+
+    pub fn debug_check_shared_cells(&self) {
+        if self.cells.is_empty() || self.cells[0].is_empty() {
+            println!("Grid is empty.");
+            return;
+        }
+
+        let first_cell = &self.cells[0][0];
+
+        let mut all_same = true;
+        for (_, row) in self.cells.iter().enumerate() {
+            for (_, cell) in row.iter().enumerate() {
+                if !std::ptr::eq(first_cell, cell) {
+                    all_same = false;
+                }
+            }
+        }
+
+        if all_same {
+            println!("⚠️ Warning: All grid cells share the same reference!");
+        } else {
+            println!("✅ Grid cells are uniquely allocated.");
+        }
+    }
+
+    pub fn debug_check_shared_possible_values(&self) {
+        if self.cells.is_empty() || self.cells[0].is_empty() {
+            println!("Grid is empty.");
+            return;
+        }
+
+        let first_possible_values = &self.cells[0][0].possible_values;
+        let mut all_same = true;
+
+        for (x, row) in self.cells.iter().enumerate() {
+            for (y, cell) in row.iter().enumerate() {
+                if std::ptr::eq(first_possible_values, &cell.possible_values) {
+                    println!(
+                        "Cell ({}, {}) shares the same possible_values reference!",
+                        x, y
+                    );
+                } else {
+                    all_same = false;
+                }
+            }
+        }
+
+        if all_same {
+            println!("⚠️  Warning: All cells share the same `possible_values` set!");
+        } else {
+            println!("✅  Each cell has a unique `possible_values` set.");
+        }
     }
 }

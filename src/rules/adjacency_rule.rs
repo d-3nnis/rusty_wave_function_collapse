@@ -1,6 +1,6 @@
 use crate::{
     adjacency_graph::{self, AdjacencyGraph},
-    types::TileType,
+    types::{PossibleValues, TileType},
 };
 
 use super::Rule;
@@ -21,26 +21,36 @@ impl<T: TileType> Rule<T> for AdjacencyRule<T> {
         grid: &mut crate::grid::Grid<T>,
         x: usize,
         y: usize,
-    ) -> Result<(), String> {
-        let collapsed_tile = match grid
+    ) -> Result<Vec<(usize, usize)>, String> {
+        let cell = grid
             .get_cell(x, y)
-            .and_then(|cell| cell.get_collapsed_value())
-        {
-            Some(tile) => tile,
-            None => return Err(format!("Cell at {x},{y} has no collapsed value")),
-        };
-        for (nx, ny) in grid.get_valid_coordinates(x, y) {
-            if let Some(neighbor_cell) = grid.get_cell_mut(nx, ny) {
+            .ok_or_else(|| format!("Cell at ({}, {}) not found", x, y))?
+            .clone();
+        let mut affected_cells = Vec::new();
+        let valid_coordinates = grid.get_valid_coordinates(x, y);
+        // println!("valid_coordinates: {:?}", valid_coordinates);
+
+        for (nx, ny) in valid_coordinates {
+            let neighbor_cell = grid.get_cell_mut(nx, ny).unwrap();
+            // println!("neighbor_cell: {},{} {:?}", nx, ny, neighbor_cell);
+            if neighbor_cell.is_collapsed() {
+                // println!("Skipping collapsed cell");
+                continue;
+            }
+            let mut allowed_neighbors = PossibleValues::new();
+            for possible_value in cell.possible_values.iter() {
                 if let Some(valid_neighbors) =
-                    self.adjacency_graph.get_valid_neighbors(&collapsed_tile)
+                    self.adjacency_graph.get_valid_neighbors(possible_value)
                 {
-                    // neighbor_cell.remove_possible_value(&collapsed_value);
-                    neighbor_cell.constrain(valid_neighbors);
-                } else {
-                    panic!("No valid neighbors for tile: {:?}", collapsed_tile)
+                    allowed_neighbors.extend(valid_neighbors.clone());
                 }
             }
+
+            if neighbor_cell.constrain(&allowed_neighbors) {
+                affected_cells.push((nx, ny));
+            }
         }
-        Ok(())
+
+        Ok(affected_cells)
     }
 }
