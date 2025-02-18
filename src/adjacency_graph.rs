@@ -1,16 +1,15 @@
-use crate::types::{PossibleValue, PossibleValues};
-use std::{
-    collections::{HashMap, HashSet},
-    hash::Hash,
-};
+use crate::types::{PossibleValue, PossibleValues, TileType};
+use std::
+    collections::{HashMap, HashSet}
+;
 
 #[derive(Debug, Clone)]
-pub struct AdjacencyGraph<T: Eq + Hash + Clone> {
+pub struct AdjacencyGraph<T: TileType> {
     graph: HashMap<PossibleValue<T>, HashSet<PossibleValue<T>>>,
 }
 
-impl<T: Eq + Hash + Clone> AdjacencyGraph<T> {
-    // add a variadic version that takes all the types? idk
+impl<T: TileType> AdjacencyGraph<T> {
+    // add a vec version that takes all the types? idk
     pub fn new() -> Self {
         Self {
             graph: HashMap::new(),

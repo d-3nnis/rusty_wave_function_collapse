@@ -33,10 +33,10 @@ impl<T: TileType> Rule<T> for AdjacencyRule<T> {
         for (nx, ny) in valid_coordinates {
             let neighbor_cell = grid.get_cell_mut(nx, ny).unwrap();
             // println!("neighbor_cell: {},{} {:?}", nx, ny, neighbor_cell);
-            if neighbor_cell.is_collapsed() {
+            // if neighbor_cell.is_collapsed() {
                 // println!("Skipping collapsed cell");
-                continue;
-            }
+                // continue;
+            // }
             let mut allowed_neighbors = PossibleValues::new();
             for possible_value in cell.possible_values.iter() {
                 if let Some(valid_neighbors) =

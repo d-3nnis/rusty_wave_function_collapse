@@ -1,10 +1,10 @@
-use std::{collections::VecDeque, usize};
+use std::usize;
 
 use crate::{
     grid::Grid,
     rules::Rule,
     traits::Renderer,
-    types::{PossibleValues, TileType},
+    types::{PossibleValue, PossibleValues, TileType},
 };
 
 pub struct WFC<T: TileType, R: Renderer<T>> {
@@ -87,23 +87,8 @@ impl<T: TileType, R: Renderer<T>> WFC<T, R> {
         best_candidate
     }
 
-    // fn collapse_highest_entropy_cell(&mut self) -> Result<Option<PossibleValue<T>>, String> {
-    //     if let Some((x, y)) = self.find_highest_entropy_cell() {
-    //         match self.grid.collapse_cell(x, y) {
-    //             Ok(ret) => {
-    //                 return Ok(Some(ret));
-    //             }
-    //             Err(err) => {
-    //                 return Err(err);
-    //             }
-    //         }
-    //     } else {
-    //         return Ok(None);
-    //     }
-    // }
-
     pub fn run(&mut self) -> Result<(), String> {
-        let mut queue: VecDeque<(usize, usize)> = VecDeque::new();
+        // let mut queue: VecDeque<(usize, usize)> = VecDeque::new();
         while let Some((x, y)) = self.find_lowest_shannon_entropy_cell() {
             // println!("Highest entropy cell: ({}, {})", x, y);
             let _cell = self.grid.collapse_cell(x, y)?;
@@ -111,19 +96,42 @@ impl<T: TileType, R: Renderer<T>> WFC<T, R> {
 
             assert!(self.grid.get_cell(x, y).unwrap().is_collapsed());
 
-            queue.push_back((x, y));
-            while let Some((cx, cy)) = queue.pop_front() {
-                // println!("Propagating constraints for cell ({}, {})", cx, cy);
-                for rule in self.rules.iter() {
-                    let affected_cells = rule.propagate_constraints(&mut self.grid, cx, cy)?;
-                    queue.extend(affected_cells);
-                }
-            }
+            self.propagate_all_constraints(vec![(x, y)]);
+
+            // queue.push_back((x, y));
+            // while let Some((cx, cy)) = queue.pop_front() {
+            //     // println!("Propagating constraints for cell ({}, {})", cx, cy);
+            //     for rule in self.rules.iter() {
+            //         let affected_cells = rule.propagate_constraints(&mut self.grid, cx, cy)?;
+            //         queue.extend(affected_cells);
+            //     }
+            // }
             if let Some(renderer) = &self.renderer {
                 renderer.render(&self.grid);
             }
             // return Ok(());
         }
         Ok(())
+    }
+
+    pub fn propagate_all_constraints(&mut self, start_cells: Vec<(usize, usize)>) {
+        let mut queue = start_cells;
+        while let Some((cx, cy)) = queue.pop() {
+            for rule in self.rules.iter() {
+                match rule.propagate_constraints(&mut self.grid, cx, cy) {
+                    Ok(mut affected_cells) => queue.append(&mut affected_cells),
+                    Err(e) => println!("Error propagating constraints: {}", e),
+                }
+            }
+        }
+    }
+
+    pub fn preset_tile(&mut self, value: PossibleValue<T>, x: usize, y: usize) {
+        if let Some(cell) = self.grid.get_cell_mut(x, y) {
+            cell.possible_values = std::iter::once(value).collect();
+            println!("Presetting cell ({}, {}) to {:?}", x, y, cell.possible_values);
+
+            self.propagate_all_constraints(vec![(x, y)]);
+        }
     }
 }

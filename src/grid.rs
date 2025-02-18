@@ -51,7 +51,21 @@ impl<T: TileType> Cell<T> {
 
     pub fn constrain_by_name(&mut self, allowed: &str) -> bool {
         let initial_len = self.possible_values.len();
+        // println!("Constraining by name: {}", allowed);
+        // println!("Before: {:?}", self.possible_values);
         self.possible_values.retain(|tile| &tile.name != allowed);
+        // println!("After: {:?}", self.possible_values);
+        assert!(self.possible_values.len() != 0);
+        return initial_len != self.possible_values.len();
+    }
+
+    pub fn constrain_by_names(&mut self, allowed: Vec<&str>) -> bool {
+        let initial_len = self.possible_values.len();
+        println!("Constraining by name: {:?}", allowed);
+        println!("Before: {:?}", self.possible_values);
+        self.possible_values
+            .retain(|tile| !allowed.contains(&&tile.name[..]));
+        println!("After: {:?}", self.possible_values);
         assert!(self.possible_values.len() != 0);
         return initial_len != self.possible_values.len();
     }
@@ -64,8 +78,14 @@ impl<T: TileType> Cell<T> {
     }
 
     pub fn collapse(&mut self) -> Result<PossibleValue<T>, String> {
-        if self.is_collapsed() {}
+        if self.is_collapsed() {
+            return Err("Cell is already collapsed".to_string());
+        }
         let mut rng = rng();
+        println!(
+            "Collapsing cell with possible_values: {:?}",
+            self.possible_values
+        );
         match self
             .possible_values
             .iter()
@@ -75,6 +95,7 @@ impl<T: TileType> Cell<T> {
             .to_owned()
         {
             Ok(chosen_tile) => {
+                println!("Chosen tile: {:?}", chosen_tile);
                 self.possible_values = HashSet::from([chosen_tile.clone()]);
                 // println!("Collapsing to {:?}", chosen_tile);
                 return Ok(chosen_tile.clone());
