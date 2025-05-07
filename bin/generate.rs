@@ -1,10 +1,8 @@
 use std::{collections::HashMap, io::{self, Write}};
 
 use colored::Color;
-// use egui::Ui;
 use wfc_too::{
     adjacency_graph::AdjacencyGraph,
-    grid::Grid,
     renderer::AsciiRenderer,
     rules::{adjacency_rule::AdjacencyRule, Rule},
     traits::{AsciiRenderable, ColorRenderable},
@@ -12,17 +10,11 @@ use wfc_too::{
     wfc::WFC,
 };
 
-// use eframe
-
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct AsciiTile {
     pub id: char,
     pub color: Color,
 }
-
-// pub struct EguiRenderer<T: TileType> {
-//     grid: Grid<T>,
-// }
 
 // hash implementation for AsciiTile
 impl std::hash::Hash for AsciiTile {
