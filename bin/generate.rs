@@ -16,7 +16,6 @@ pub struct AsciiTile {
     pub color: Color,
 }
 
-// hash implementation for AsciiTile
 impl std::hash::Hash for AsciiTile {
     fn hash<H: std::hash::Hasher>(&self, state: &mut H) {
         self.id.hash(state);
@@ -34,65 +33,6 @@ impl AsciiRenderable for AsciiTile {
 impl ColorRenderable for AsciiTile {
     fn get_color(&self) -> Color {
         return self.color;
-    }
-}
-
-pub struct BeachCleanupRule;
-
-impl<T: TileType> Rule<T> for BeachCleanupRule {
-    fn propagate_constraints(
-        &self,
-        grid: &mut wfc_too::grid::Grid<T>,
-        x: usize,
-        y: usize,
-    ) -> Result<Vec<(usize, usize)>, String> {
-        let mut affected_cells = Vec::new();
-
-        // Only check for beach tiles
-        if !grid
-            .get_cell(x, y)
-            .unwrap()
-            .possible_values
-            .iter()
-            .any(|tile| tile.name == "Beach")
-        {
-            return Ok(affected_cells);
-        }
-
-        let mut has_water = false;
-        let mut has_grass = false;
-
-        for (nx, ny) in grid.get_valid_coordinates(x, y) {
-            if let Some(neighbor) = grid.get_cell(nx, ny) {
-                if neighbor
-                    .possible_values
-                    .iter()
-                    .any(|tile| tile.name == "Water")
-                {
-                    has_water = true;
-                }
-                if neighbor
-                    .possible_values
-                    .iter()
-                    .any(|tile| tile.name == "Grass")
-                {
-                    has_grass = true;
-                }
-            }
-        }
-
-        // If a beach tile doesn't have both grass and water nearby, remove it
-        if !(has_water && has_grass) {
-            println!("Removing invalid beach at ({}, {})", x, y);
-            let cell = grid.get_cell_mut(x, y).unwrap();
-            if !cell.is_collapsed() {
-                if cell.constrain_by_name("Beach") {
-                    affected_cells.push((x, y));
-                }
-            }
-        }
-
-        Ok(affected_cells)
     }
 }
 
