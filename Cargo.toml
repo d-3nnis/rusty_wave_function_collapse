@@ -1,5 +1,5 @@
 [package]
-name = "wfc_too"
+name = "rusty_wave_function_collapse"
 version = "0.1.0"
 edition = "2021"
 
@@ -9,7 +9,7 @@ crossterm = "0.28.1"
 rand = "0.9.0"
 
 [lib]
-name = "wfc_too"
+name = "rusty_wave_function_collapse"
 path = "src/lib.rs"
 
 [[bin]]

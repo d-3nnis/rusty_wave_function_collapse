@@ -1,7 +1,7 @@
 use std::{collections::HashMap, io::{self, Write}};
 
 use colored::Color;
-use wfc_too::{
+use rusty_wave_function_collapse::{
     adjacency_graph::AdjacencyGraph,
     renderer::AsciiRenderer,
     rules::{adjacency_rule::AdjacencyRule, Rule},
