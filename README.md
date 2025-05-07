@@ -34,15 +34,6 @@ To include the project as a library in other projects, you can follow these step
   ```
   Replace `"path/to/rusty_wave_function_collapse"` with the actual path to the `rusty_wave_function_collapse` project.
 
-* Import the necessary modules in your code. For example:
-  ```rust
-  extern crate rusty_wave_function_collapse;
-  use wfc_too::grid::Grid;
-  use wfc_too::renderer::AsciiRenderer;
-  use wfc_too::wfc::WFC;
-  use wfc_too::types::{Tile, TileType};
-  ```
-
 For a simple example, reference `bin/generate.rs`.
 
 ## Contributing
