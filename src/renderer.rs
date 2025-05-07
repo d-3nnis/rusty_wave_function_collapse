@@ -18,9 +18,9 @@ pub struct AsciiRenderer;
 
 impl<T: TileType + AsciiRenderable + ColorRenderable> Renderer<T> for AsciiRenderer {
     fn render(&self, grid: &Grid<T>) {
-        // render_ascii(grid);
+        render_ascii(grid);
         // simple_render(grid);
-        debug_render(grid);
+        // debug_render(grid);
     }
 }
 

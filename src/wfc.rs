@@ -24,7 +24,7 @@ fn calculate_shannon_entropy<T: TileType>(possible_values: &PossibleValues<T>) -
         .iter()
         .map(|tile| {
             let p = (tile.weight as f64) / total_weight;
-            -p * p.log2() // Shannon entropy formula
+            -p * p.log2()
         })
         .sum()
 }
@@ -43,28 +43,6 @@ impl<T: TileType, R: Renderer<T>> WFC<T, R> {
             renderer,
         }
     }
-
-    // fn find_highest_entropy_cell(&self) -> Option<(usize, usize)> {
-    //     let mut highest_entropy = usize::MIN;
-    //     let mut highest_entropy_cell = (0, 0);
-    //     for (x, row) in self.grid.get_cells().iter().enumerate() {
-    //         for (y, cell) in row.iter().enumerate() {
-    //             if cell.is_collapsed() {
-    //                 continue;
-    //             }
-    //             let entropy = cell.possible_values.len();
-    //             if entropy > highest_entropy {
-    //                 highest_entropy = entropy;
-    //                 highest_entropy_cell = (x, y);
-    //             }
-    //         }
-    //     }
-    //     if highest_entropy == usize::MIN {
-    //         None
-    //     } else {
-    //         Some(highest_entropy_cell)
-    //     }
-    // }
 
     fn find_lowest_shannon_entropy_cell(&self) -> Option<(usize, usize)> {
         let mut lowest_entropy = f64::INFINITY; // Start with a large value
@@ -88,28 +66,15 @@ impl<T: TileType, R: Renderer<T>> WFC<T, R> {
     }
 
     pub fn run(&mut self) -> Result<(), String> {
-        // let mut queue: VecDeque<(usize, usize)> = VecDeque::new();
         while let Some((x, y)) = self.find_lowest_shannon_entropy_cell() {
-            // println!("Highest entropy cell: ({}, {})", x, y);
             let _cell = self.grid.collapse_cell(x, y)?;
-            // println!("Collapsing cell ({:?})", cell);
 
             assert!(self.grid.get_cell(x, y).unwrap().is_collapsed());
-
             self.propagate_all_constraints(vec![(x, y)]);
 
-            // queue.push_back((x, y));
-            // while let Some((cx, cy)) = queue.pop_front() {
-            //     // println!("Propagating constraints for cell ({}, {})", cx, cy);
-            //     for rule in self.rules.iter() {
-            //         let affected_cells = rule.propagate_constraints(&mut self.grid, cx, cy)?;
-            //         queue.extend(affected_cells);
-            //     }
-            // }
             if let Some(renderer) = &self.renderer {
                 renderer.render(&self.grid);
             }
-            // return Ok(());
         }
         Ok(())
     }
@@ -132,6 +97,14 @@ impl<T: TileType, R: Renderer<T>> WFC<T, R> {
             println!("Presetting cell ({}, {}) to {:?}", x, y, cell.possible_values);
 
             self.propagate_all_constraints(vec![(x, y)]);
+        }
+    }
+
+    pub fn debug_render(&self) {
+        if let Some(renderer) = &self.renderer {
+            renderer.render(&self.grid);
+        } else {
+            println!("No renderer available for debug rendering.");
         }
     }
 }

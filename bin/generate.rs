@@ -104,9 +104,6 @@ impl<T: TileType> Rule<T> for BeachCleanupRule {
     }
 }
 
-pub struct BeachEnforcementRule;
-
-
 /// Computes and prints the probability breakdown of each tile type
 pub fn analyze_initial_tile_probabilities<T: TileType>(possible_tiles: &PossibleValues<T>) {
     let total_weight: f64 = possible_tiles.iter().map(|tile| tile.weight as f64).sum();
@@ -163,49 +160,27 @@ fn main() {
         "Hills",
         2,
     );
-    let deep_ocean = Tile::new(
-        self::AsciiTile {
-            id: 'o',
-            color: Color::Blue,
-        },
-        "Deep Ocean",
-        1,
-    );
     let tile_types: PossibleValues<AsciiTile> = vec![
         beach.clone(),
         grass.clone(),
         water.clone(),
         hills.clone(),
-        // deep_ocean.clone(),
     ]
     .into_iter()
     .collect();
 
-    // let options = eframe::NativeOptions {
-    //     viewport: egui::ViewportBuilder::default().with_inner_size([320.0,240.0]),
-    //     ..Default::default()
-    // };
     let mut adj_graph = AdjacencyGraph::new();
-    adj_graph.add_self_adjacencies(vec![&grass, &water, &beach, &hills /* &deep_ocean */]);
-    // adj_graph.add_adjacency(&grass, &hills);
+    adj_graph.add_self_adjacencies(vec![&grass, &water, &beach, &hills]);
     adj_graph.add_adjacency(&grass, &beach);
     adj_graph.add_adjacency(&beach, &water);
-    adj_graph.add_adjacency(&deep_ocean, &water);
     let adj_rule = AdjacencyRule::new(adj_graph);
-    // let beach_rule = BeachCleanupRule;
-    let beach_enforcement_rule = BeachEnforcementRule;
     let renderer = Some(AsciiRenderer);
     let rules: Vec<Box<dyn Rule<AsciiTile>>> = vec![
         Box::new(adj_rule),
-        // Box::new(beach_rule),
-        // Box::new(beach_enforcement_rule),
     ];
     analyze_initial_tile_probabilities(&tile_types);
-    let grid_size = 5;
-    // let grid_width = 50;
-    // let grid_height = 30;
-    // let mut wfc = WFC::new(grid_width, grid_height, tile_types, rules, renderer);
-    let mut wfc = WFC::new(grid_size, grid_size, tile_types, rules, renderer);
+    let grid_size = 15;
+    let mut wfc = WFC::new(grid_size, grid_size+10, tile_types, rules, renderer);
     wfc.preset_tile(water.clone(), 0, 0);
     wfc.preset_tile(grass.clone(), 4, 3);
     wfc.preset_tile(grass.clone(), 3, 4);
@@ -216,8 +191,6 @@ fn main() {
 
     match wfc.run() {
         Ok(_) => {
-            // let string = "Nice".color("green");
-            // println!("{}", string);
         }
         Err(err) => {
             println!("Error: {}", err);

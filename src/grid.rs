@@ -16,20 +16,6 @@ pub struct Cell<T: TileType> {
     pub possible_values: PossibleValues<T>,
 }
 
-// impl<T: TileType> PartialEq for Cell<T> {
-//     fn eq(&self, other: &Self) -> bool {
-//         self.possible_values
-//             .iter()
-//             .map(|tile| &tile.id)
-//             .collect::<HashSet<_>>() ==
-//         other
-//             .possible_values
-//             .iter()
-//             .map(|tile| &tile.id)
-//             .collect::<HashSet<_>>()
-//     }
-// }
-
 impl<T: TileType> Cell<T> {
     pub fn new(possible_values: PossibleValues<T>) -> Self {
         Self { possible_values }
@@ -51,21 +37,15 @@ impl<T: TileType> Cell<T> {
 
     pub fn constrain_by_name(&mut self, allowed: &str) -> bool {
         let initial_len = self.possible_values.len();
-        // println!("Constraining by name: {}", allowed);
-        // println!("Before: {:?}", self.possible_values);
         self.possible_values.retain(|tile| &tile.name != allowed);
-        // println!("After: {:?}", self.possible_values);
         assert!(self.possible_values.len() != 0);
         return initial_len != self.possible_values.len();
     }
 
     pub fn constrain_by_names(&mut self, allowed: Vec<&str>) -> bool {
         let initial_len = self.possible_values.len();
-        println!("Constraining by name: {:?}", allowed);
-        println!("Before: {:?}", self.possible_values);
         self.possible_values
             .retain(|tile| !allowed.contains(&&tile.name[..]));
-        println!("After: {:?}", self.possible_values);
         assert!(self.possible_values.len() != 0);
         return initial_len != self.possible_values.len();
     }
@@ -82,10 +62,10 @@ impl<T: TileType> Cell<T> {
             return Err("Cell is already collapsed".to_string());
         }
         let mut rng = rng();
-        println!(
-            "Collapsing cell with possible_values: {:?}",
-            self.possible_values
-        );
+        // println!(
+        //     "Collapsing cell with possible_values: {:?}",
+        //     self.possible_values
+        // );
         match self
             .possible_values
             .iter()
@@ -95,7 +75,7 @@ impl<T: TileType> Cell<T> {
             .to_owned()
         {
             Ok(chosen_tile) => {
-                println!("Chosen tile: {:?}", chosen_tile);
+                // println!("Chosen tile: {:?}", chosen_tile);
                 self.possible_values = HashSet::from([chosen_tile.clone()]);
                 // println!("Collapsing to {:?}", chosen_tile);
                 return Ok(chosen_tile.clone());
@@ -110,7 +90,7 @@ impl<T: TileType> Cell<T> {
 impl<T: TileType> Grid<T> {
     pub fn new(width: usize, height: usize, possible_tiles: PossibleValues<T>) -> Self {
         // TODO share identical possible_values between cells?
-        let cells = vec![vec![Cell::new(possible_tiles); width]; height];
+        let cells = vec![vec![Cell::new(possible_tiles); height]; width];
         Self {
             width,
             height,
@@ -198,9 +178,9 @@ impl<T: TileType> Grid<T> {
         }
 
         if all_same {
-            println!("⚠️ Warning: All grid cells share the same reference!");
+            println!("Warning: All grid cells share the same reference!");
         } else {
-            println!("✅ Grid cells are uniquely allocated.");
+            println!("Grid cells are uniquely allocated.");
         }
     }
 
@@ -227,9 +207,9 @@ impl<T: TileType> Grid<T> {
         }
 
         if all_same {
-            println!("⚠️  Warning: All cells share the same `possible_values` set!");
+            println!("Warning: All cells share the same `possible_values` set!");
         } else {
-            println!("✅  Each cell has a unique `possible_values` set.");
+            println!("Each cell has a unique `possible_values` set.");
         }
     }
 }
