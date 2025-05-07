@@ -10,15 +10,38 @@ cd rusty_wave_function_collapse
 cargo build --release
 ```
 
-## Usage
+## Running sample code
 
-To use this project, you can run the `generate` binary:
+To run the example `generate` binary
 
 ```sh
 cargo run --release --bin generate
 ```
 
+
 This will generate a pattern using the Wave Function Collapse algorithm and print it to the console.
+
+## Usage
+
+To include the project as a library in other projects, you can follow these steps:
+
+* Add the following to your `Cargo.toml` file:
+  ```toml
+  [dependencies]
+  rusty_wave_function_collapse = { path = "path/to/rusty_wave_function_collapse" }
+  ```
+  Replace `"path/to/rusty_wave_function_collapse"` with the actual path to the `rusty_wave_function_collapse` project.
+
+* Import the necessary modules in your code. For example:
+  ```rust
+  extern crate rusty_wave_function_collapse;
+  use wfc_too::grid::Grid;
+  use wfc_too::renderer::AsciiRenderer;
+  use wfc_too::wfc::WFC;
+  use wfc_too::types::{Tile, TileType};
+  ```
+
+For a simple example, reference `bin/generate.rs`.
 
 ## Sample Output
 
