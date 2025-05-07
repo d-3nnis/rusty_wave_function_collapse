@@ -38,5 +38,5 @@ For a simple example, reference `bin/generate.rs`.
 
 ## Contributing
 
-Contributions are welcome! If you would like to contribute to this project, please follow these steps:
+Contributions are welcome!
 
