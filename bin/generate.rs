@@ -174,12 +174,11 @@ fn main() {
     let grid_size = 15;
     let mut wfc = WFC::new(grid_size, grid_size+10, tile_types, rules, renderer);
     wfc.preset_tile(water.clone(), 0, 0);
-    wfc.preset_tile(grass.clone(), 4, 3);
-    wfc.preset_tile(grass.clone(), 3, 4);
-
-
-    // based on all the tile weights, print the percentage chance of collapse for each type please!
-    // Then wait for input.
+    wfc.preset_tile(water.clone(), 5, 0);
+    wfc.preset_tile(water.clone(), 0, 5);
+    wfc.preset_tile(grass.clone(), 0, 10);
+    wfc.preset_tile(grass.clone(), 10, 0);
+    wfc.preset_tile(grass.clone(), 10, 10);
 
     match wfc.run() {
         Ok(_) => {
