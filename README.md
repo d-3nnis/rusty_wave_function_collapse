@@ -21,6 +21,8 @@ cargo run --release --bin generate
 
 This will generate a pattern using the Wave Function Collapse algorithm and print it to the console.
 
+![Image](https://github.com/user-attachments/assets/f0f2b0bd-acad-4f4a-97c8-0ca7da1b6be5)
+
 ## Usage
 
 To include the project as a library in other projects, you can follow these steps:
@@ -42,10 +44,6 @@ To include the project as a library in other projects, you can follow these step
   ```
 
 For a simple example, reference `bin/generate.rs`.
-
-## Sample Output
-
-![Image](https://github.com/user-attachments/assets/f0f2b0bd-acad-4f4a-97c8-0ca7da1b6be5)
 
 ## Contributing
 
